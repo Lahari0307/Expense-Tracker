@@ -1,13 +1,13 @@
-// Import Firebase modules
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+// Firebase SDK imports
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
 import {
   getFirestore,
   collection,
   addDoc,
   getDocs
-} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+} from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
-// Your Firebase config
+// Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyAVX30uedkNsKSYoIBOapf7ta5WDM6s2r0",
   authDomain: "expense-tracker-f5882.firebaseapp.com",
@@ -17,48 +17,50 @@ const firebaseConfig = {
   appId: "1:367190631621:web:d6da7360052cd98c627cac"
 };
 
-// Initialize Firebase
+// Init Firebase & Firestore
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// Add expense
+// Reference to collection
+const expensesCollection = collection(db, "expenses");
+
+// Add new expense
 window.addExpense = async function () {
   const name = document.getElementById("expenseName").value;
-  const amount = document.getElementById("expenseAmount").value;
+  const amount = parseFloat(document.getElementById("expenseAmount").value);
 
-  if (!name || !amount) {
-    alert("Please fill in all fields");
+  if (!name || isNaN(amount)) {
+    alert("Please enter a valid name and amount.");
     return;
   }
 
   try {
-    await addDoc(collection(db, "expenses"), {
-      name: name,
-      amount: parseFloat(amount),
-      timestamp: new Date()
+    await addDoc(expensesCollection, {
+      name,
+      amount,
+      createdAt: new Date()
     });
-    alert("Expense added successfully ✅");
     document.getElementById("expenseName").value = "";
     document.getElementById("expenseAmount").value = "";
-    loadExpenses(); // refresh list
+    loadExpenses();
   } catch (e) {
     console.error("Error adding document: ", e);
   }
 };
 
-// Load expenses from Firestore
+// Load and display expenses
 async function loadExpenses() {
   const expensesList = document.getElementById("expenses");
   expensesList.innerHTML = "";
 
-  const querySnapshot = await getDocs(collection(db, "expenses"));
-  querySnapshot.forEach((doc) => {
+  const snapshot = await getDocs(expensesCollection);
+  snapshot.forEach((doc) => {
     const data = doc.data();
     const li = document.createElement("li");
-    li.textContent = `${data.name} - ₹${data.amount}`;
+    li.textContent = `${data.name}: $${data.amount}`;
     expensesList.appendChild(li);
   });
 }
 
-// Load on page load
-window.onload = loadExpenses;
+// Load expenses on start
+loadExpenses();
