@@ -1,49 +1,66 @@
-const supabaseUrl = "https://your-project.supabase.co"; // <- Replace
-const supabaseKey = "your-anon-key"; // <- Replace
-const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+// Firebase CDN setup (uses global firebase object)
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js";
+import { getFirestore, collection, addDoc, onSnapshot, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore.js";
 
-document.getElementById('expense-form').addEventListener('submit', async (e) => {
+// Your Firebase config
+const firebaseConfig = {
+  apiKey: "AIzaSyAVX30uedkNsKSYoIBOapf7ta5WDM6s2r0",
+  authDomain: "expense-tracker-f5882.firebaseapp.com",
+  projectId: "expense-tracker-f5882",
+  storageBucket: "expense-tracker-f5882.firebasestorage.app",
+  messagingSenderId: "367190631621",
+  appId: "1:367190631621:web:d6da7360052cd98c627cac"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// DOM Elements
+const form = document.getElementById("expense-form");
+const list = document.getElementById("expense-list");
+const totalDisplay = document.getElementById("total");
+
+// Handle form submit
+form.addEventListener("submit", async (e) => {
   e.preventDefault();
+  const amount = parseFloat(document.getElementById("amount").value);
+  const category = document.getElementById("category").value;
+  const description = document.getElementById("description").value;
+  const date = document.getElementById("date").value;
 
-  const amount = parseFloat(document.getElementById('amount').value);
-  const category = document.getElementById('category').value;
-  const description = document.getElementById('description').value;
-  const date = document.getElementById('date').value;
+  try {
+    await addDoc(collection(db, "expenses"), {
+      amount,
+      category,
+      description,
+      date,
+      createdAt: serverTimestamp()
+    });
 
-  const { error } = await supabase.from('expenses').insert([
-    { amount, category, description, date }
-  ]);
-
-  if (error) {
-    alert('Error saving expense');
-    console.error(error);
-  } else {
-    loadExpenses();
-    e.target.reset();
+    form.reset();
+  } catch (err) {
+    console.error("Error adding expense: ", err);
+    alert("Failed to add expense");
   }
 });
 
-async function loadExpenses() {
-  const { data, error } = await supabase.from('expenses').select('*').order('date', { ascending: false });
+// Real-time listener
+const expensesRef = collection(db, "expenses");
+const q = query(expensesRef, orderBy("createdAt", "desc"));
 
-  const list = document.getElementById('expense-list');
-  const totalEl = document.getElementById('total');
-  list.innerHTML = '';
+onSnapshot(q, (snapshot) => {
+  list.innerHTML = "";
   let total = 0;
 
-  if (error) {
-    console.error(error);
-    return;
-  }
-
-  data.forEach(expense => {
-    total += expense.amount;
-    const li = document.createElement('li');
-    li.textContent = `${expense.date} - ${expense.category}: $${expense.amount}`;
+  snapshot.forEach((doc) => {
+    const data = doc.data();
+    const li = document.createElement("li");
+    li.textContent = `${data.date} - ${data.category}: ₹${data.amount} — ${data.description}`;
     list.appendChild(li);
+
+    total += data.amount;
   });
 
-  totalEl.textContent = `Total: $${total.toFixed(2)}`;
-}
-
-loadExpenses();
+  totalDisplay.textContent = `Total: ₹${total.toFixed(2)}`;
+});
