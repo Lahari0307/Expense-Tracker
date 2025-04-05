@@ -1,13 +1,18 @@
-// Firebase CDN setup (uses global firebase object)
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js";
-import { getFirestore, collection, addDoc, onSnapshot, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore.js";
+// Import Firebase modules
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  getDocs
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 // Your Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyAVX30uedkNsKSYoIBOapf7ta5WDM6s2r0",
   authDomain: "expense-tracker-f5882.firebaseapp.com",
   projectId: "expense-tracker-f5882",
-  storageBucket: "expense-tracker-f5882.firebasestorage.app",
+  storageBucket: "expense-tracker-f5882.appspot.com",
   messagingSenderId: "367190631621",
   appId: "1:367190631621:web:d6da7360052cd98c627cac"
 };
@@ -16,51 +21,44 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// DOM Elements
-const form = document.getElementById("expense-form");
-const list = document.getElementById("expense-list");
-const totalDisplay = document.getElementById("total");
+// Add expense
+window.addExpense = async function () {
+  const name = document.getElementById("expenseName").value;
+  const amount = document.getElementById("expenseAmount").value;
 
-// Handle form submit
-form.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const amount = parseFloat(document.getElementById("amount").value);
-  const category = document.getElementById("category").value;
-  const description = document.getElementById("description").value;
-  const date = document.getElementById("date").value;
+  if (!name || !amount) {
+    alert("Please fill in all fields");
+    return;
+  }
 
   try {
     await addDoc(collection(db, "expenses"), {
-      amount,
-      category,
-      description,
-      date,
-      createdAt: serverTimestamp()
+      name: name,
+      amount: parseFloat(amount),
+      timestamp: new Date()
     });
-
-    form.reset();
-  } catch (err) {
-    console.error("Error adding expense: ", err);
-    alert("Failed to add expense");
+    alert("Expense added successfully ✅");
+    document.getElementById("expenseName").value = "";
+    document.getElementById("expenseAmount").value = "";
+    loadExpenses(); // refresh list
+  } catch (e) {
+    console.error("Error adding document: ", e);
   }
-});
+};
 
-// Real-time listener
-const expensesRef = collection(db, "expenses");
-const q = query(expensesRef, orderBy("createdAt", "desc"));
+// Load expenses from Firestore
+async function loadExpenses() {
+  const expensesList = document.getElementById("expenses");
+  expensesList.innerHTML = "";
 
-onSnapshot(q, (snapshot) => {
-  list.innerHTML = "";
-  let total = 0;
-
-  snapshot.forEach((doc) => {
+  const querySnapshot = await getDocs(collection(db, "expenses"));
+  querySnapshot.forEach((doc) => {
     const data = doc.data();
     const li = document.createElement("li");
-    li.textContent = `${data.date} - ${data.category}: ₹${data.amount} — ${data.description}`;
-    list.appendChild(li);
-
-    total += data.amount;
+    li.textContent = `${data.name} - ₹${data.amount}`;
+    expensesList.appendChild(li);
   });
+}
 
-  totalDisplay.textContent = `Total: ₹${total.toFixed(2)}`;
-});
+// Load on page load
+window.onload = loadExpenses;
