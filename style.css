@@ -1,30 +1,216 @@
+/* Full-screen background */
 body {
-  font-family: Arial, sans-serif;
-  background: #f2f2f2;
-  padding: 20px;
+    margin: 0;
+    font-family: "Poppins", sans-serif;
+    background: url("background.png") no-repeat center/cover fixed;
+    display: flex;
+    justify-content: center;
+    padding-top: 40px;
 }
 
+/* MAIN WRAPPER – holds center panel + right panel */
+.wrapper {
+    display: flex;
+    gap: 30px;
+    width: 95%;
+    max-width: 1300px;
+}
+
+/* CENTER PANEL */
 .container {
-  max-width: 500px;
-  margin: auto;
-  background: #fff;
-  padding: 20px;
-  border-radius: 10px;
+    width: 70%;
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(20px);
+    padding: 30px;
+    border-radius: 20px;
 }
 
-form input, form button {
-  width: 100%;
-  margin: 5px 0;
-  padding: 10px;
+/* RIGHT PANEL (Expense List) */
+.expense-panel {
+    width: 25%;
+    background: rgba(255, 255, 255, 0.16);
+    backdrop-filter: blur(18px);
+    padding: 25px;
+    border-radius: 20px;
+    height: fit-content;
 }
 
-ul {
-  list-style: none;
-  padding: 0;
+/* Headings */
+h2, h3 {
+    text-align: center;
+    color: white;
 }
 
-li {
-  background: #eee;
-  padding: 10px;
-  margin: 5px 0;
+/* Card Sections */
+.card {
+    background: rgba(255, 255, 255, 0.20);
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 25px;
+}
+
+/* Centered limited-width form controls (shorter white boxes + buttons) */
+.card input,
+.card textarea,
+.card select,
+.card button {
+    max-width: 640px;        /* overall maximum width for inputs/buttons */
+    width: 88%;              /* slightly shortened relative to card */
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    box-sizing: border-box;
+}
+
+/* Inputs */
+input {
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    margin-bottom: 15px;
+    font-size: 16px;
+    background: rgba(255,255,255,0.95);   /* keep white/bright appearance */
+}
+
+/* Buttons (primary style) */
+button {
+    padding: 12px;
+    background: #9c0068;
+    color: white;
+    border: none;
+    font-size: 17px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+button:hover {
+    opacity: 0.9;
+}
+
+/* Reduce size for special action buttons inside expense items */
+.paid-btn, .delete-btn {
+    padding: 10px;
+    font-size: 15px;
+    border-radius: 12px;
+}
+
+/* Expense item */
+.expense-item {
+    background: #f3e8ff; /* light purple box */
+    border: 2px solid #d7b8ff; /* soft purple border */
+    padding: 15px;
+    border-radius: 16px;
+    margin-bottom: 18px;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+    transition: transform 0.4s ease, opacity 0.3s;
+    transform-origin: center;
+}
+
+.expense-item.flip {
+    transform: rotateY(180deg);
+    opacity: 0.3;
+}
+
+.expense-item.slide-out {
+    transform: translateX(-120%);
+    opacity: 0;
+}
+
+/* Expense line items */
+.expense-top {
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.expense-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 12px;
+}
+
+/* PAID button */
+.paid-btn {
+    flex: 1;
+    background: #34c759;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease-in-out;
+}
+
+.paid-btn:hover {
+    background: #28a745;
+}
+
+/* DELETE button */
+.delete-btn {
+    flex: 1;
+    background: #ff3b30;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease-in-out;
+}
+
+.delete-btn:hover {
+    background: #d8342b;
+}
+
+/* Logout: simple inline button (shorter and styled like a real button) */
+.logout-btn {
+    display: block;
+    margin: 12px auto 0;
+    padding: 10px 18px;
+    background: #f32505;
+    color: white;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-size: 15px;
+    text-align: center;
+}
+
+/* lighter "ghost" logout variant if you prefer */
+.logout-btn.ghost {
+    background: rgba(255,255,255,0.25);
+    color: #111;
+    box-shadow: none;
+}
+
+/* Icon Style */
+.delete-btn i,
+.paid-btn i {
+    font-size: 18px;
+}
+
+/* Mobile Responsive */
+@media (max-width: 900px) {
+    .wrapper {
+        flex-direction: column;
+    }
+    .container,
+    .expense-panel {
+        width: 100%;
+    }
+
+    /* Make inputs/buttons a bit wider on small screens (fit to container) */
+    .card input,
+    .card textarea,
+    .card select,
+    .card button {
+        width: 95%;
+        max-width: none;
+    }
+
+    .logout-btn {
+        margin: 16px auto 0;
+    }
 }

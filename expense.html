@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <title>Expense Tracker</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="wrapper">
+
+        <!-- CENTER PANEL -->
+        <div class="container">
+            <h2>Expense Tracker 💸</h2>
+
+            <div class="card">
+                <h3>Monthly Limit</h3>
+                <input type="number" id="limitInput" placeholder="Enter Limit">
+                <button id="saveLimitBtn">Save Limit</button>
+
+                <p id="remainingDisplay">Remaining: ₹0.00</p>
+                <p id="warningMessage"></p>
+            </div>
+
+            <div class="card">
+                <h3>Add Expense</h3>
+                <input type="text" id="descInput" placeholder="Description">
+                <input type="number" id="amountInput" placeholder="Amount">
+                <input type="text" id="categoryInput" placeholder="Category">
+                <button id="addExpenseBtn">Add Expense</button>
+            </div>
+
+            <button id="logoutBtn" class="logout-btn">Logout</button>
+        </div>
+
+        <!-- RIGHT PANEL -->
+        <div class="expense-panel">
+            <h3>Your Expenses</h3>
+            <div id="expenseList">No expenses yet.</div>
+
+            <h3>Category Totals</h3>
+            <div id="categoryTotalsBox"></div>
+        </div>
+
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+    <script src="script.js"></script>
+
+</body>
+</html>
